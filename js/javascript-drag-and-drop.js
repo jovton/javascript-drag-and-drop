@@ -5,7 +5,7 @@
         e.dataTransfer.setData("Text", this.id);
     });
 
-    var b1 = document.getElementById("bucket1");
+    var b1 = document.getElementById("bucket2");
     b1.addEventListener("dragenter", function(e) {
         b1.classList.add("over");
         e.returnValue = false;
