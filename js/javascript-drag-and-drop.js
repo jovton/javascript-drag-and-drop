@@ -1,27 +1,73 @@
-(function (window, jovton, $, undefined) {
-    var chip = document.getElementById("chip");
+var jovton = (function (window, jovton, $, undefined) {
 
-    chip.addEventListener("dragstart", function (e) {
-        e.dataTransfer.setData("Text", this.id);
-    });
+    window.onload = function () {
+        configureChipDragStart();
+        configureBucketDrops();
 
-    var b1 = document.getElementById("bucket2");
-    b1.addEventListener("dragenter", function(e) {
-        b1.classList.add("over");
-        e.returnValue = false;
-    });
-    b1.addEventListener("dragleave", function() {
-        b1.classList.remove("over");
-    });
-    b1.addEventListener("dragover", function (e) {
-        e.returnValue = false;
-    });
-    b1.addEventListener("drop", function(e) {
-        e.returnValue = false;
-        var data = event.dataTransfer.getData("Text");
-        var d = document.getElementById(data);
-        d.classList.remove("begin");
-        d.classList.add("dropped");
-        this.appendChild(d);
-    });
-})(window, window.jovton = window.jovton || {});
+        function configureChipDragStart() {
+            var chip = document.getElementById("chip");
+
+            chip.addEventListener("dragstart", function (e) {
+                e.dataTransfer.setData("Text", this.id);
+                e.dataTransfer.setData("EightBall", "8 Ball says: " + jovton.get88all());
+            });
+        }
+
+        function configureBucketDrops() {
+            var buckets = document.getElementsByClassName("bucket");
+
+            for (var i = 0; i < buckets.length; i++) {
+                var bucket = buckets[i];
+                bucket.addEventListener("dragenter", function (e) {
+                    bucket.classList.add("over");
+                    e.returnValue = false;
+                });
+                bucket.addEventListener("dragleave", function () {
+                    bucket.classList.remove("over");
+                });
+                bucket.addEventListener("dragover", function (e) {
+                    e.returnValue = false;
+                });
+                bucket.addEventListener("drop", function (e) {
+                    var self = this;
+
+                    moveTheChip();
+                    displayEightBallMessage();
+
+                    e.dataTransfer.clearData();
+                    e.returnValue = false;
+
+                    function moveTheChip() {
+                        var chipElementId = e.dataTransfer.getData("Text");
+                        var chippy = document.getElementById(chipElementId);
+                        chippy.classList.remove("begin");
+                        chippy.classList.add("dropped");
+                        self.appendChild(chippy);
+                    }
+
+                    function displayEightBallMessage() {
+                        var eightBallMessage = e.dataTransfer.getData("EightBall");
+                        var eightBallBox = document.getElementById("eightBallMessageBox");
+                        eightBallBox.innerHTML = eightBallMessage;
+                    }
+                });
+            }
+        }
+    }
+
+    var eightBallMessages = [
+        "It's looking good!",
+        "Prepare to strike it lucky!",
+        "It's a tough road, but you'll get there!",
+        "Lookout! Big and heavy storm clouds ahead!"
+    ];
+
+    return {
+        get88all: function () {
+            var n = new Number(Math.random().toString().substr(2, 1));
+            var i = n < 2 ? 0 : n < 5 ? 1 : n < 8 ? 2 : 3;
+
+            return eightBallMessages[i];
+        }
+    }
+})(window, window.jovton = window.jovton || {}, jQuery);
